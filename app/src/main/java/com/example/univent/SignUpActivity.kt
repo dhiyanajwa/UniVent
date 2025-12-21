@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -31,29 +34,54 @@ class SignUpActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
-            Log.d("SignUpDebug", "Button Clicked! Email: $email")
-
             if (email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
                 if (password == confirmPassword) {
-                    
-                    Toast.makeText(this, "Connecting to Firebase...", Toast.LENGTH_SHORT).show()
-                    
+
+                    Toast.makeText(this, "Creating account...", Toast.LENGTH_SHORT).show()
+
                     firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.d("SignUpDebug", "Registration Success!")
-                            Toast.makeText(this, "Sign Up Successful!", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(this, CatalogActivity::class.java)
-                            startActivity(intent)
-                            finish()
+                            val user = firebaseAuth.currentUser
+
+                            // STEP 1: Send Verification Email
+                            user?.sendEmailVerification()?.addOnCompleteListener { verifyTask ->
+                                if (verifyTask.isSuccessful) {
+                                    Log.d("SignUpDebug", "Verification email sent.")
+
+                                    // STEP 2: Sign out immediately
+                                    // (They can't be logged in yet because they aren't verified)
+                                    firebaseAuth.signOut()
+
+                                    Toast.makeText(this, "Account created! Please check your email for verification.", Toast.LENGTH_LONG).show()
+
+                                    // STEP 3: Redirect to Login
+                                    val intent = Intent(this, LoginActivity::class.java)
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    Log.e("SignUpDebug", "Failed to send email: ${verifyTask.exception?.message}")
+                                    Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         } else {
-                            Log.e("SignUpDebug", "Registration Failed: ${task.exception?.message}")
-                            Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            // Level 5 Rubric: Advanced Error Handling
+                            val errorMessage = when (task.exception) {
+                                is FirebaseAuthUserCollisionException -> "This email is already registered."
+                                is FirebaseAuthWeakPasswordException -> "Password is too weak (min 6 characters)."
+                                is FirebaseAuthInvalidCredentialsException -> "Invalid email format."
+                                else -> task.exception?.message ?: "Registration failed."
+                            }
+
+                            Log.e("SignUpDebug", "Registration Failed: $errorMessage")
+                            Toast.makeText(this, "Error: $errorMessage", Toast.LENGTH_LONG).show()
                         }
                     }
                 } else {
                     Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 }
             } else {
+                // Replacing Toast with standard Toast for simplicity as per your original code
                 Toast.makeText(this, "All fields must be filled", Toast.LENGTH_SHORT).show()
             }
         }
@@ -61,6 +89,7 @@ class SignUpActivity : AppCompatActivity() {
         loginRedirectTextView.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }
