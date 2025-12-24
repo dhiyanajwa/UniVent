@@ -3,11 +3,7 @@ package com.example.univent
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 
-/**
- * Goal: Complete CRUD + Firebase integration.
- * Task: Represent a campus event with all required multimedia and text metadata.
- * Strategy for Full Marks: Use @IgnoreExtraProperties for stability and @Exclude for ID handling.
- */
+
 @IgnoreExtraProperties
 data class Event(
     @get:Exclude var id: String = "", // Document ID from Firestore (not stored as a field)

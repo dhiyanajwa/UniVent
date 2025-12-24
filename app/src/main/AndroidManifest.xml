@@ -14,12 +14,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UniVent">
         <activity
+            android:name=".UserProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddEditActivity"
             android:exported="false" />
         <activity
             android:name=".AdminDashboardActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="true">

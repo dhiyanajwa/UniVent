@@ -1,5 +1,6 @@
 package com.example.univent
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var firebaseAuth: FirebaseAuth
@@ -21,9 +21,10 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // LEVEL 5 UX: Session Persistence with Role Check
+        // If user is already logged in, skip login screen
         val currentUser = firebaseAuth.currentUser
         if (currentUser != null) {
+            Log.d("LoginDebug", "Session found for: ${currentUser.email}")
             checkUserRoleAndNavigate(currentUser.uid)
         }
     }
@@ -35,7 +36,6 @@ class LoginActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // UI Element References
         val emailEditText = findViewById<TextInputEditText>(R.id.email_edit_text)
         val passwordEditText = findViewById<TextInputEditText>(R.id.password_edit_text)
         val loginButton = findViewById<Button>(R.id.login_button)
@@ -47,34 +47,29 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show()
+                loginButton.isEnabled = false // Prevent double clicks
+                Toast.makeText(this, "Authenticating...", Toast.LENGTH_SHORT).show()
 
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val user = firebaseAuth.currentUser
                         if (user != null) {
-                            // Check if verified (optional check, but we still proceed to role check)
-                            if (user.isEmailVerified) {
-                                Log.d("LoginDebug", "Login Success & Verified")
-                            } else {
-                                Log.d("LoginDebug", "Login Success (Unverified)")
-                            }
-
-                            // Essential: Check Firestore role before navigating
+                            Log.d("LoginDebug", "Auth Success: ${user.uid}")
                             checkUserRoleAndNavigate(user.uid)
                         }
                     } else {
+                        loginButton.isEnabled = true
                         val errorMessage = when (task.exception) {
-                            is FirebaseAuthInvalidUserException -> "No account found with this email."
-                            is FirebaseAuthInvalidCredentialsException -> "Incorrect password or email format."
+                            is FirebaseAuthInvalidUserException -> "No account found."
+                            is FirebaseAuthInvalidCredentialsException -> "Wrong password."
                             else -> task.exception?.message ?: "Login failed."
                         }
-                        Log.e("LoginDebug", "Login Failed: $errorMessage")
-                        Toast.makeText(this, "Error: $errorMessage", Toast.LENGTH_LONG).show()
+                        Log.e("LoginDebug", "Auth Error: $errorMessage")
+                        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
                     }
                 }
             } else {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -87,48 +82,57 @@ class LoginActivity : AppCompatActivity() {
             if (email.isNotEmpty()) {
                 firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Password reset email sent to $email", Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Reset link sent!", Toast.LENGTH_SHORT).show()
                     }
                 }
-            } else {
-                Toast.makeText(this, "Enter your email first to reset password", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    /**
-     * Rubric: Full sync with Firebase.
-     * Fetches the user role from Firestore and navigates to the appropriate dashboard.
-     */
     private fun checkUserRoleAndNavigate(uid: String) {
+        Log.d("LoginDebug", "Fetching role for UID: $uid")
+
         db.collection("users").document(uid).get()
             .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
+                // Determine destination
+                val intent = if (document != null && document.exists()) {
                     val role = document.getString("role") ?: "student"
+                    Log.d("LoginDebug", "Role found: $role")
 
-                    val intent = if (role.lowercase() == "admin") {
-                        Log.d("LoginDebug", "Admin detected, heading to Dashboard")
+                    if (role.equals("admin", ignoreCase = true)) {
                         Intent(this, AdminDashboardActivity::class.java)
                     } else {
-                        Log.d("LoginDebug", "Student detected, heading to Catalog")
                         Intent(this, CatalogActivity::class.java)
                     }
-
-                    startActivity(intent)
-                    finish()
                 } else {
-                    // Fallback if user doc doesn't exist yet (Safety default)
-                    startActivity(Intent(this, CatalogActivity::class.java))
-                    finish()
+                    // Fallback to Catalog if user document is missing
+                    Log.e("LoginDebug", "Document does not exist for UID: $uid. Defaulting to Catalog.")
+                    Intent(this, CatalogActivity::class.java)
                 }
+
+                startIntent(intent)
             }
             .addOnFailureListener { e ->
-                Log.e("LoginDebug", "Error fetching role: ${e.message}")
-                Toast.makeText(this, "Sync Error: Loading Catalog as guest.", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, CatalogActivity::class.java))
-                finish()
+                Log.e("LoginDebug", "Firestore Error: ${e.message}")
+                Toast.makeText(this, "Login Sync Error. Opening Catalog...", Toast.LENGTH_SHORT).show()
+                // Fallback to Catalog on network error
+                startIntent(Intent(this, CatalogActivity::class.java))
             }
+    }
+
+    private fun startIntent(intent: Intent) {
+        try {
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        } catch (e: ActivityNotFoundException) {
+            // CRITICAL: This catches missing Manifest entries
+            Log.e("LoginDebug", "CRITICAL ERROR: Activity not found in Manifest!", e)
+            Toast.makeText(this, "Error: Screen not registered in AndroidManifest.xml", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            // Catches crashes inside the next Activity's onCreate
+            Log.e("LoginDebug", "Navigation Crashed: ${e.message}", e)
+            Toast.makeText(this, "Error opening screen: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 }

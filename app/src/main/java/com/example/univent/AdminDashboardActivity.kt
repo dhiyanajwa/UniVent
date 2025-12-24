@@ -12,11 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-/**
- * Goal: Complete CRUD + Firebase integration for Admin.
- * Task: Manage campus events (Create, Read, Update, Delete) and view stats.
- * Strategy for Full Marks: Implement real-time sync with error handling and confirmation dialogs.
- */
+
 class AdminDashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAdminDashboardBinding

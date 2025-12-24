@@ -28,6 +28,15 @@
         <item name="cornerSizeTopRight">0dp</item>
     </style>
 
+    <style name="TopRoundedCard40" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">40dp</item>
+        <item name="cornerSizeTopRight">40dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+
     <style name="AdminEventCard" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">#FFFFFF</item>
         <item name="cardCornerRadius">20dp</item>
