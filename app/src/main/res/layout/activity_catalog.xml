@@ -7,7 +7,6 @@
     android:background="#FFFFFF"
     android:orientation="vertical">
 
-    <!-- Header Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,183 +35,127 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <!-- Search Bar (Styled to look like your EditText) -->
-        <!-- We use SearchView to keep the kotlin logic working -->
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_search_rounded"
-            app:queryBackground="@android:color/transparent"
+            android:background="@android:drawable/editbox_background"
             app:iconifiedByDefault="false"
-            app:queryHint="🔍 Search campus events..." />
+            app:queryHint="Search events..." />
 
     </LinearLayout>
 
-    <!-- Filter Chips (Replaces the static LinearLayout buttons for functionality) -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:paddingStart="26dp"
-        android:paddingBottom="10dp"
-        android:clipToPadding="false">
+        android:paddingHorizontal="26dp"
+        android:scrollbars="none">
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupCategories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true">
+            app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipAll"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
                 android:text="All"
-                android:textColor="@color/cardview_dark_background"
-                app:chipBackgroundColor="@color/material_on_primary_disabled" />
+                android:checked="true" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipSeminar"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Seminar" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipWorkshop"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Workshop" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipSports"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sports" />
 
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Music" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
-
-    <!-- Bottom Navigation Bar (Visual Only) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvStudentEvents"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:clipToPadding="false"
         android:paddingHorizontal="16dp"
-        android:paddingTop="10dp"
+        android:clipToPadding="false"
         tools:listitem="@layout/item_student_event" />
 
     <LinearLayout
-        android:id="@+id/bottomNavBar"
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_bottom_nav"
-        android:orientation="vertical"
-        android:paddingVertical="13dp">
+        android:layout_height="65dp"
+        android:background="#FFFFFF"
+        android:elevation="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="28dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="vertical">
+            <TextView android:text="🏠" android:textSize="22sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="Home" android:textColor="#000000" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-            <!-- Home Item -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-                <TextView
-                    android:text="🏠"
-                    android:textSize="20sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:text="Home"
-                    android:textColor="#2C8EFF"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/navCalendar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="vertical">
+            <TextView android:text="📅" android:textSize="22sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="Calendar" android:textColor="#000000" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-            <!-- Calendar Item -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-                <TextView
-                    android:text="📅"
-                    android:textSize="20sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:text="Calendar"
-                    android:textColor="#000000"
-                    android:textSize="12sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/navBookmark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="vertical">
+            <TextView android:text="🔖" android:textSize="22sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="Bookmark" android:textColor="#000000" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-            <!-- Bookmark Item -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-                <TextView
-                    android:text="🔖"
-                    android:textSize="20sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:text="Bookmark"
-                    android:textColor="#000000"
-                    android:textSize="12sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <!-- Profile Item -->
-            <LinearLayout
-                android:id="@+id/navProfile"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:orientation="vertical">
-                <TextView
-                    android:text="👤"
-                    android:textSize="20sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:text="Profile"
-                    android:textColor="#000000"
-                    android:textSize="12sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
+        <LinearLayout
+            android:id="@+id/navProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="vertical">
+            <TextView android:text="👤" android:textSize="22sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="Profile" android:textColor="#000000" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

@@ -156,6 +156,11 @@ class CatalogActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.navCalendar.setOnClickListener {
+            val intent = Intent(this, CalendarActivity::class.java)
+            startActivity(intent)
+        }
+
         // Example: If you have a logout button in Profile, ensure it calls auth.signOut()
     }
 }

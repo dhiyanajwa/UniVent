@@ -46,6 +46,11 @@
         <activity
             android:name=".CatalogActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".CalendarActivity"
+            android:exported="false"
+            android:label="My Calendar" />
     </application>
 
 </manifest>
