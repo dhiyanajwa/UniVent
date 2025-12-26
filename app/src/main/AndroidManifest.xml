@@ -51,6 +51,10 @@
             android:name=".CalendarActivity"
             android:exported="false"
             android:label="My Calendar" />
+
+        <activity
+            android:name=".BookmarkActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

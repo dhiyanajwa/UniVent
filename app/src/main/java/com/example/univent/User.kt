@@ -1,4 +1,4 @@
-package com.univent
+package com.example.univent
 
 import com.google.firebase.firestore.IgnoreExtraProperties
 

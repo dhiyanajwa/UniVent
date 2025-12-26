@@ -3,83 +3,84 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFFFFF">
+    android:background="#F8F9FA"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:paddingTop="40dp"
+        android:paddingBottom="20dp"
+        android:paddingHorizontal="20dp"
+        android:background="#FFFFFF">
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_back"
+            android:contentDescription="Back" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Schedule"
-            android:textSize="22sp"
+            android:layout_centerInParent="true"
+            android:text="MY SCHEDULE"
+            android:textColor="#000000"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginStart="12dp"
-            android:textColor="#000000"/>
-    </LinearLayout>
+            android:letterSpacing="0.1" />
+    </RelativeLayout>
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
+
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvSelectedDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select a date to see events"
-        android:textStyle="bold"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="12dp"
+        android:text="Events on this day"
         android:textColor="#666666"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"/>
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCalendarEvents"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="20dp" />
 
         <LinearLayout
             android:id="@+id/layoutEmptyState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📅"
-                android:textSize="48sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No events for this day"
-                android:textColor="#999999"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textSize="50sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No events for this day" android:textColor="#999999" android:textSize="16sp" />
         </LinearLayout>
     </FrameLayout>
-
 </LinearLayout>

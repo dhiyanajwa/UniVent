@@ -81,14 +81,15 @@ class CatalogActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: return
         val userRef = db.collection("users").document(userId)
 
-        // First, check current state to decide whether to add or remove
         userRef.get().addOnSuccessListener { doc ->
-            val bookmarks = doc.get("bookmarks") as? List<String> ?: emptyList()
+            val fieldName = "bookmarkedEvents"
+            val bookmarks = doc.get(fieldName) as? List<String> ?: emptyList()
+
             if (bookmarks.contains(eventId)) {
-                userRef.update("bookmarks", FieldValue.arrayRemove(eventId))
+                userRef.update(fieldName, FieldValue.arrayRemove(eventId))
                 Toast.makeText(this, "Removed from bookmarks", Toast.LENGTH_SHORT).show()
             } else {
-                userRef.update("bookmarks", FieldValue.arrayUnion(eventId))
+                userRef.update(fieldName, FieldValue.arrayUnion(eventId))
                 Toast.makeText(this, "Added to bookmarks", Toast.LENGTH_SHORT).show()
             }
         }
@@ -158,6 +159,11 @@ class CatalogActivity : AppCompatActivity() {
 
         binding.navCalendar.setOnClickListener {
             val intent = Intent(this, CalendarActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.navBookmark.setOnClickListener {
+            val intent = Intent(this, BookmarkActivity::class.java)
             startActivity(intent)
         }
 

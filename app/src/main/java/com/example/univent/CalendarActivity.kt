@@ -104,13 +104,12 @@ class CalendarActivity : AppCompatActivity() {
         val filtered = joinedEventsList.filter { it.date == date }
         adapter.submitList(filtered)
 
-        // Toggles visibility for the Empty State
         if (filtered.isEmpty()) {
-            binding.rvCalendarEvents.visibility = View.GONE
             binding.layoutEmptyState.visibility = View.VISIBLE
+            binding.rvCalendarEvents.visibility = View.GONE
         } else {
-            binding.rvCalendarEvents.visibility = View.VISIBLE
             binding.layoutEmptyState.visibility = View.GONE
+            binding.rvCalendarEvents.visibility = View.VISIBLE
         }
     }
 
