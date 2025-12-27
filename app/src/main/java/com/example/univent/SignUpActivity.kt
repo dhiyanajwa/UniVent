@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.univent.User
+
 /**
  * Goal: Full Firebase authentication with advanced error handling and Firestore sync.
  * Task: Create Auth account, send verification, and initialize User document in Firestore.
