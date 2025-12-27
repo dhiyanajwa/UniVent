@@ -17,13 +17,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Event Image -->
-        <ImageView
-            android:id="@+id/ivEventImage"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Event banner" />
+            android:layout_height="180dp">
+
+            <ImageView
+                android:id="@+id/ivEventImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Event banner" />
+
+            <ImageButton
+                android:id="@+id/ivBookmark"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:background="@drawable/bg_circle_white_semi_transparent"
+                android:src="@drawable/ic_bookmark_outline"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Bookmark this event" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,8 +53,6 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <!-- Date Badge (Replaces Category Chip) -->
-                <!-- ID changed to tvDate so adapter binds date here -->
                 <TextView
                     android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
@@ -51,13 +65,8 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="12dp"/>
-
-
-
-
             </LinearLayout>
 
-            <!-- Title -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
@@ -68,13 +77,11 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <!-- Location -->
             <TextView
                 android:id="@+id/tvLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:drawablePadding="4dp"
                 android:text="Location Name"
                 android:textColor="#666666"
                 android:textSize="10sp" />

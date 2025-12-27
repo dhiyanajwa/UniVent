@@ -25,83 +25,88 @@ class EventDetailActivity : AppCompatActivity() {
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
-
-        // Retrieve the ID passed from CatalogActivity
         eventId = intent.getStringExtra("EVENT_ID")
 
-        // 1. Back Button Navigation
-        binding.btnBack.setOnClickListener {
-            // Finishes current activity to return to the previous one (Catalog)
-            finish()
-        }
-
-        // 2. Load Event Data
         if (eventId != null) {
             loadEventDetails()
             checkBookmarkStatus()
-        } else {
-            Toast.makeText(this, "Error: Event details not found.", Toast.LENGTH_SHORT).show()
-            finish()
+
+            // Matches XML ID: ivBookmark (Top-right bookmark icon)
+            binding.ivBookmark.setOnClickListener { toggleBookmark() }
+
+            // Matches XML ID: btnJoinEvent (The "JOIN THIS EVENT" button)
+            binding.btnJoinEvent.setOnClickListener { joinEvent() }
         }
 
-        // 3. Animated Bookmark Toggle
-        binding.ivBookmark.setOnClickListener {
-            toggleBookmark()
-        }
-
-        binding.btnJoinEvent.setOnClickListener {
-            Toast.makeText(this, "Successfully registered for this event!", Toast.LENGTH_LONG).show()
-        }
+        binding.btnBack.setOnClickListener { finish() }
     }
 
     private fun loadEventDetails() {
-        db.collection("events").document(eventId!!).get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val event = document.toObject(Event::class.java)
-                    event?.let {
-                        binding.tvDetailTitle.text = it.title
-                        binding.tvDetailDate.text = "${it.date}, ${it.time}"
-                        binding.tvDetailLocation.text = it.location
-                        binding.tvDetailDescription.text = it.description
-                        binding.chipCategory.text = it.category
+        val currentEventId = eventId ?: return
+        db.collection("events").document(currentEventId).get()
+            .addOnSuccessListener { doc ->
+                val event = doc.toObject(Event::class.java)
+                event?.let {
+                    // UPDATED: These match your new activity_event_detail.xml IDs
+                    binding.tvEventTitle.text = it.title
+                    binding.tvEventDate.text = "${it.date} • ${it.time}"
+                    binding.tvEventLocation.text = it.location
+                    binding.tvEventDescription.text = it.description
+                    binding.chipCategory.text = it.category
 
-                        // Load image using Glide
-                        if (it.imageUrl.isNotEmpty()) {
-                            Glide.with(this)
-                                .load(it.imageUrl)
-                                .placeholder(R.drawable.event_seminar)
-                                .into(binding.ivDetailImage)
-                        }
-                    }
+                    Glide.with(this)
+                        .load(it.imageUrl)
+                        .placeholder(R.drawable.event_seminar)
+                        .into(binding.ivEventImage)
                 }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
+    /**
+     * CALENDAR SYNC: Saves to "joinedEvents" field
+     */
+    private fun joinEvent() {
+        val userId = auth.currentUser?.uid ?: return
+        val currentEventId = eventId ?: return
+
+        db.collection("users").document(userId)
+            .update("joinedEvents", FieldValue.arrayUnion(currentEventId))
+            .addOnSuccessListener {
+                Toast.makeText(this, "Event added to your Schedule!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to join event", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /**
+     * BOOKMARK SYNC: Uses "bookmarkedEvents" field
+     */
     private fun checkBookmarkStatus() {
         val userId = auth.currentUser?.uid ?: return
         db.collection("users").document(userId).get()
             .addOnSuccessListener { doc ->
-                val bookmarks = doc.get("bookmarks") as? List<String> ?: emptyList()
-                isBookmarked = bookmarks.contains(eventId)
-                updateBookmarkUI(false) // Update UI without animating on initial load
+                // SAFE CAST FIX: Handles the "Unchecked cast" warning
+                val bookmarks = doc.get("bookmarkedEvents") as? List<*>
+                val bookmarkList = bookmarks?.filterIsInstance<String>() ?: emptyList()
+
+                isBookmarked = bookmarkList.contains(eventId)
+                updateBookmarkUI(false)
             }
     }
 
     private fun toggleBookmark() {
         val userId = auth.currentUser?.uid ?: return
         val userRef = db.collection("users").document(userId)
+        val currentEventId = eventId ?: return
 
         isBookmarked = !isBookmarked
-        updateBookmarkUI(true) // Animate on click
+        updateBookmarkUI(true)
 
         if (isBookmarked) {
-            userRef.update("bookmarks", FieldValue.arrayUnion(eventId))
+            userRef.update("bookmarkedEvents", FieldValue.arrayUnion(currentEventId))
         } else {
-            userRef.update("bookmarks", FieldValue.arrayRemove(eventId))
+            userRef.update("bookmarkedEvents", FieldValue.arrayRemove(currentEventId))
         }
     }
 
@@ -111,12 +116,11 @@ class EventDetailActivity : AppCompatActivity() {
 
         if (shouldAnimate) {
             binding.ivBookmark.animate()
-                .scaleX(1.4f)
-                .scaleY(1.4f)
+                .scaleX(1.4f).scaleY(1.4f)
                 .setDuration(200)
                 .setInterpolator(BounceInterpolator())
                 .withEndAction {
-                    binding.ivBookmark.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                    binding.ivBookmark.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start()
                 }.start()
         }
     }

@@ -13,12 +13,11 @@ class StudentEventAdapter(
     private val onItemClick: (Event) -> Unit
 ) : ListAdapter<Event, StudentEventAdapter.EventViewHolder>(EventDiffCallback()) {
 
-    // List of IDs that the current user has bookmarked
     private var bookmarkedIds: List<String> = emptyList()
 
     fun updateBookmarks(newBookmarks: List<String>) {
         bookmarkedIds = newBookmarks
-        notifyDataSetChanged() // Refresh UI to show correct star status
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
@@ -40,23 +39,24 @@ class StudentEventAdapter(
             binding.tvDate.text = "${event.date} • ${event.time}"
             binding.tvLocation.text = event.location
 
-            // Image Loading
-            if (event.imageUrl.isNotEmpty()) {
-                Glide.with(binding.ivEventImage.context)
-                    .load(event.imageUrl)
-                    .placeholder(R.drawable.event_seminar) // Make sure this drawable exists
-                    .into(binding.ivEventImage)
-            } else {
-                binding.ivEventImage.setImageResource(R.drawable.event_seminar)
-            }
+            // Update Bookmark Icon based on global list
+            val isBookmarked = bookmarkedIds.contains(event.id)
+            binding.ivBookmark.setImageResource(
+                if (isBookmarked) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark_outline
+            )
+
+            Glide.with(binding.ivEventImage.context)
+                .load(event.imageUrl)
+                .placeholder(R.drawable.event_seminar)
+                .into(binding.ivEventImage)
 
             // Click Listeners
-            binding.root.setOnClickListener {
-                onItemClick(event)
-            }
+            binding.root.setOnClickListener { onItemClick(event) }
 
-            // Assuming there is a bookmark button in the item layout, if not, this part is just placeholder logic based on constructor
-            // binding.btnBookmark.setOnClickListener { onBookmarkClick(event) } 
+            // FIXED: Enable bookmark click listener in the adapter
+            binding.ivBookmark.setOnClickListener {
+                onBookmarkClick(event)
+            }
         }
     }
 
