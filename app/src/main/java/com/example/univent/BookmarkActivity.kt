@@ -2,6 +2,7 @@ package com.example.univent
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import com.example.univent.databinding.ActivityBookmarkBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.messaging.FirebaseMessaging
 
 class BookmarkActivity : AppCompatActivity() {
 
@@ -44,10 +46,18 @@ class BookmarkActivity : AppCompatActivity() {
         binding.rvBookmarkedEvents.adapter = adapter
     }
 
+    /**
+     * Listen for real-time changes in the user's bookmarkedEvents list
+     */
     private fun listenToBookmarks() {
         val userId = auth.currentUser?.uid ?: return
         db.collection("users").document(userId)
-            .addSnapshotListener { document, _ ->
+            .addSnapshotListener { document, error ->
+                if (error != null) {
+                    Log.e("BOOKMARK_ERROR", "Error listening to bookmarks", error)
+                    return@addSnapshotListener
+                }
+
                 val bookmarkIds = document?.get("bookmarkedEvents") as? List<String> ?: emptyList()
 
                 if (bookmarkIds.isNotEmpty()) {
@@ -62,6 +72,9 @@ class BookmarkActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Fetch the full details for each bookmarked event ID
+     */
     private fun fetchEventDetails(ids: List<String>) {
         db.collection("events").whereIn("__name__", ids).get()
             .addOnSuccessListener { snapshots ->
@@ -70,12 +83,29 @@ class BookmarkActivity : AppCompatActivity() {
                 }
                 adapter.submitList(events)
             }
+            .addOnFailureListener { e ->
+                Log.e("FETCH_ERROR", "Error fetching event details", e)
+            }
     }
 
+    /**
+     * UPDATED: Removes bookmark from Firestore AND unsubscribes from FCM Topic
+     */
     private fun removeBookmark(eventId: String) {
         val userId = auth.currentUser?.uid ?: return
+
         db.collection("users").document(userId)
             .update("bookmarkedEvents", FieldValue.arrayRemove(eventId))
-            .addOnSuccessListener { Toast.makeText(this, "Removed", Toast.LENGTH_SHORT).show() }
+            .addOnSuccessListener {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("bookmark_$eventId")
+                    .addOnSuccessListener {
+                        Log.d("FCM_TOPIC", "Successfully unsubscribed from bookmark_$eventId")
+                    }
+
+                Toast.makeText(this, "Removed from Bookmarks", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to remove bookmark: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }

@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
@@ -13,48 +15,46 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UniVent">
-        <activity
-            android:name=".UserProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".EventDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AddEditActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AdminDashboardActivity"
-            android:exported="false" />
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="univent_notifications" />
+
+        <activity android:name=".UserProfileActivity" android:exported="false" />
+        <activity android:name=".AddEditActivity" android:exported="false" />
+        <activity android:name=".AdminDashboardActivity" android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SignUpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CatalogActivity"
-            android:exported="false" />
 
         <activity
-            android:name=".CalendarActivity"
-            android:exported="false"
-            android:label="My Calendar" />
+            android:name=".EventDetailActivity"
+            android:parentActivityName=".MainActivity"> <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
+        </activity>
 
-        <activity
-            android:name=".BookmarkActivity"
-            android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".SignUpActivity" android:exported="false" />
+        <activity android:name=".ForgotPasswordActivity" android:exported="false" />
+        <activity android:name=".CatalogActivity" android:exported="false" />
+        <activity android:name=".CalendarActivity" android:exported="false" android:label="My Calendar" />
+        <activity android:name=".BookmarkActivity" android:exported="false" />
+        <activity android:name=".EditProfileActivity" android:exported="false" />
+
     </application>
-
 </manifest>

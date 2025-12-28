@@ -39,24 +39,13 @@ class StudentEventAdapter(
             binding.tvDate.text = "${event.date} • ${event.time}"
             binding.tvLocation.text = event.location
 
-            // Update Bookmark Icon based on global list
-            val isBookmarked = bookmarkedIds.contains(event.id)
-            binding.ivBookmark.setImageResource(
-                if (isBookmarked) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark_outline
-            )
-
             Glide.with(binding.ivEventImage.context)
                 .load(event.imageUrl)
                 .placeholder(R.drawable.event_seminar)
                 .into(binding.ivEventImage)
 
-            // Click Listeners
             binding.root.setOnClickListener { onItemClick(event) }
 
-            // FIXED: Enable bookmark click listener in the adapter
-            binding.ivBookmark.setOnClickListener {
-                onBookmarkClick(event)
-            }
         }
     }
 

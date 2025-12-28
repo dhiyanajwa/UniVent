@@ -28,17 +28,6 @@
                 android:scaleType="centerCrop"
                 android:contentDescription="Event banner" />
 
-            <ImageButton
-                android:id="@+id/ivBookmark"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="12dp"
-                android:background="@drawable/bg_circle_white_semi_transparent"
-                android:src="@drawable/ic_bookmark_outline"
-                android:padding="8dp"
-                android:scaleType="centerInside"
-                android:contentDescription="Bookmark this event" />
         </FrameLayout>
 
         <LinearLayout
