@@ -20,53 +20,60 @@
             android:id="@+id/header_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#A1CCF7"
-            app:cardElevation="4dp"
+            app:cardBackgroundColor="#001F3F"
+            app:cardElevation="3dp"
+            app:strokeWidth="0dp"
+            app:cardUseCompatPadding="false"
+            app:cardPreventCornerOverlap="false"
             app:shapeAppearanceOverlay="@style/BottomRoundedHeader40">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="50dp">
+                android:paddingBottom="30dp">
 
                 <ImageButton
                     android:id="@+id/btn_back"
                     android:layout_width="40dp"
                     android:layout_height="38dp"
-                    android:layout_marginStart="18dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="28dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Back"
                     android:scaleType="fitXY"
                     android:src="@drawable/ic_back"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:tint="@android:color/white" />
 
                 <TextView
                     android:id="@+id/tv_admin_console"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginBottom="16dp"
                     android:text="ADMIN CONSOLE"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
                 <TextView
                     android:id="@+id/tv_manage_events"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="25dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="30dp"
                     android:text="Manage Events"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="28sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_back" />
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </com.google.android.material.appbar.AppBarLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
